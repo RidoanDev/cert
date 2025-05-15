@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import AdminPanel from "@/components/AdminPanel";
 import { createCertificateRequest, findCertificateRequestByName, CertificateRequest } from "@/data/certificateRequests";
 import Logo from "@/components/Logo";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 
 const Index = () => {
   const [userName, setUserName] = useState("");
@@ -167,19 +167,26 @@ const Index = () => {
       variant: "default",
     });
 
-    // In a real app, this would generate a PDF certificate
     try {
-      // Here you would generate or fetch a PDF
-      // For demo purposes, we're simulating it with a timeout
-      setTimeout(() => {
-        setDownloading(false);
-        toast({
-          title: "ডাউনলোড সম্পন্ন",
-          description: "আপনার সার্টিফিকেট ডাউনলোড হয়েছে।",
-          variant: "default",
-        });
-      }, 2000);
+      // Create a link to download the certificate from the public folder
+      const certificateUrl = '/Certificate.pdf';
+      
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement('a');
+      link.href = certificateUrl;
+      link.download = `${userName}-certificate.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setDownloading(false);
+      toast({
+        title: "ডাউনলোড সম্পন্ন",
+        description: "আপনার সার্টিফিকেট ডাউনলোড হয়েছে।",
+        variant: "default",
+      });
     } catch (error) {
+      console.error("Download error:", error);
       setDownloading(false);
       toast({
         title: "ডাউনলোড ব্যর্থ",
@@ -299,7 +306,10 @@ const Index = () => {
                             <span>ডাউনলোড হচ্ছে...</span>
                           </div>
                         ) : (
-                          "সার্টিফিকেট ডাউনলোড করুন"
+                          <div className="flex items-center gap-2">
+                            <Download className="h-4 w-4" />
+                            <span>সার্টিফিকেট ডাউনলোড করুন</span>
+                          </div>
                         )}
                       </Button>
                     </div>
